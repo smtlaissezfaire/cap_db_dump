@@ -1,7 +1,7 @@
 CapDbDump
 =========
 
-Capistrano recipes for backing up your database, and transfer database dumps to
+Capistrano recipes for backing your production database and transfering it to
 your local machine.
 
 
