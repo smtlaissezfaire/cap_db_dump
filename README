@@ -6,7 +6,7 @@ your local machine.
 
 
 Howto
-=======
+=====
 
 Add these line to your config/deploy.rb file:
 
