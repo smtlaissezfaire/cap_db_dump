@@ -20,6 +20,9 @@ set :database_username,  "" # db username
 set :database_host,      "" # database hostname
 set :database_password,  "" # database password
 set :ssh_server,         "" # name of the server in your .ssh/config
+# If you give a name for the session table, only the schema for that table will
+# be backed up. If the value is nil, disregard this option
+set :sessions_table,     nil 
 
 
 

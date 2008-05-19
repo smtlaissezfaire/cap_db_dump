@@ -1,11 +1,8 @@
 Capistrano::Configuration.instance(:must_exist).load do
   namespace :db do
-    # Set the following in your deploy.rb:
-    set :database_name,      "" # db name
-    set :database_username,  "" # db username
-    set :database_host,      "" # database hostname
-    set :database_password,  "" # database password, as defined in database.yml
-    set :ssh_server,         "" # name of the server in your .ssh/config
+    # If you give a name for the session table, only the schema for that table will
+    # be backed up. If the value is nil, disregard this option
+    set :sessions_table,     nil 
 
     set :dump_root_path, "/tmp"
     set :now, Time.now
@@ -48,20 +45,22 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     task :create_dump, :roles => :app, :except => { :no_release => true } do
+      ignore_sessions = sessions_table ? "--ignore-table=#{database_name}.sessions" : ""
+      
       command = <<-HERE
-      mysqldump -u #{database_username} -h #{database_host} -p#{database_password} -Q  --add-drop-table -O add-locks=FALSE --lock-tables=FALSE --single-transaction --ignore-table=#{database_name}.sessions #{database_name} > #{dump_path}
-    HERE
+        mysqldump -u #{database_username} -h #{database_host} -p#{database_password} -Q  --add-drop-table -O add-locks=FALSE --lock-tables=FALSE --single-transaction #{ignore_sessions} #{database_name} > #{dump_path}
+      HERE
 
       give_description "About to dump production DB"
 
       run command
-      session_schema_dump
+      session_schema_dump if sessions_table
     end
     
     task :session_schema_dump, :roles => :app, :except => { :no_release => true } do
       command = <<-HERE
-      mysqldump -u #{database_username} -h #{database_host} -p#{database_password} -Q --add-drop-table --single-transaction --no-data #{database_name} sessions >> #{dump_path}
-    HERE
+        mysqldump -u #{database_username} -h #{database_host} -p#{database_password} -Q --add-drop-table --single-transaction --no-data #{database_name} sessions >> #{dump_path}
+      HERE
 
       give_description "Dumping sessions table from db"
 
