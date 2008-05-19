@@ -1,5 +1,12 @@
 # CapDbDump Recipies
 
+# Set the following in your deploy.rb:
+set :database_name,      "" # db name
+set :database_username,  "" # db username
+set :database_host,      "" # database hostname
+set :database_password,  "" # database password, as defined in database.yml
+set :ssh_server,         "" # name of the server in your .ssh/config
+
 Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :db do
