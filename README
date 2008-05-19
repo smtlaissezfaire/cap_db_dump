@@ -15,10 +15,10 @@ require "cap_db_dump/lib/cap_db_dump/recipes"
 
 Set the following environment variables properly:
 
-set :database_name,      "" # db name
+set :database_name,      "" # db name, as defined in database.yml
 set :database_username,  "" # db username
 set :database_host,      "" # database hostname
-set :database_password,  "" # database password, as defined in database.yml
+set :database_password,  "" # database password
 set :ssh_server,         "" # name of the server in your .ssh/config
 
 
