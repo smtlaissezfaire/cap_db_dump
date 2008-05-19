@@ -1,5 +1,4 @@
 Capistrano::Configuration.instance(:must_exist).load do
-  
   namespace :db do
     # Set the following in your deploy.rb:
     set :database_name,      "" # db name
@@ -100,5 +99,4 @@ Capistrano::Configuration.instance(:must_exist).load do
       `#{cmd}`
     end
   end
-  
 end
