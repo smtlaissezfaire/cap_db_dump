@@ -1,13 +1,26 @@
 CapDbDump
 =========
 
-Introduction goes here.
+Capistrano recipes for backing up your database, and transfer database dumps to
+your local machine.
 
 
-Example
+Howto
 =======
 
-Example goes here.
+Add these line to your config/deploy.rb file:
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + "/../vendor/plugins"
+require "cap_db_dump/lib/cap_db_dump/recipes"
+
+Set the following environment variables properly:
+
+set :database_name,      "" # db name
+set :database_username,  "" # db username
+set :database_host,      "" # database hostname
+set :database_password,  "" # database password, as defined in database.yml
+set :ssh_server,         "" # name of the server in your .ssh/config
 
 
-Copyright (c) 2008 [name of plugin creator], released under the MIT license
+
+Copyright (c) 2008 Scott Taylor / Eastmedia <scott@eastmedia.com>, released under the MIT license
