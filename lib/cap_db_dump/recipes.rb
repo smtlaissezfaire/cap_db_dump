@@ -1,10 +1,12 @@
 Capistrano::Configuration.instance(:must_exist).load do
   namespace :db do
-    set :database_name,      "" # db name, as defined in database.yml
-    set :database_username,  "" # db username
-    set :database_host,      "" # database hostname
-    set :database_password,  "" # database password
-    set :ssh_server,         "" # name of the server in your .ssh/config
+    
+#     set :database_name,      "" # db name, as defined in database.yml
+#     set :database_username,  "" # db username
+#     set :database_host,      "" # database hostname
+#     set :database_password,  "" # database password
+#     set :ssh_server,         "" # name of the server in your .ssh/config
+    
     # If you give a name for the session table, only the schema for that table will
     # be backed up. If the value is nil, disregard this option
     set :sessions_table,     nil 
@@ -12,8 +14,11 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :dump_root_path, "/tmp"
     set :now, Time.now
     set :formatted_time, now.strftime("%Y-%m-%d")
-    set :dump_path, "#{dump_root_path}/#{database_name}_dump_#{formatted_time}.sql"
     set :keep_dumps, 3
+    
+    def dump_path
+      "#{dump_root_path}/#{database_name}_dump_#{formatted_time}.sql"
+    end
 
     def give_description(desc_string)
       puts "  ** #{desc_string}"
