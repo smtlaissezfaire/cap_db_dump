@@ -25,5 +25,4 @@ set :ssh_server,         "" # name of the server in your .ssh/config
 set :sessions_table,     nil 
 
 
-
 Copyright (c) 2008 Scott Taylor / Eastmedia <scott@eastmedia.com>, released under the MIT license
