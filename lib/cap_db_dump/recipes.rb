@@ -1,5 +1,5 @@
 Capistrano::Configuration.instance(:must_exist).load do
-  namespace :db do
+  namespace :database do
     
 #     set :database_name,      "" # db name, as defined in database.yml
 #     set :database_username,  "" # db username
@@ -55,7 +55,11 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       
       def tasks_matching_for_db_dump
-        { :only => { :db_dump => true } }
+        { :only => option_for_db_dump }
+      end
+      
+      def option_for_db_dump
+        { :db_dump => true }
       end
     end
     
@@ -81,6 +85,22 @@ Capistrano::Configuration.instance(:must_exist).load do
           end
         end
       end
+    end
+    
+    def find_server_matching_options
+      role_names = roles.map {  |role| role[0] } # an array of role symbol names, like [:app, :db]
+      role_names.each { |role_name|
+        roles[role_name].servers.each { |server|
+          if server.options[:db_dump] == true
+            return server
+          end
+        }
+      }
+      nil
+    end
+    
+    def server_matching_options
+      @server_matching_options ||= find_server_matching_options
     end
     
     def each_database_file_with_index(data)
@@ -139,14 +159,10 @@ Capistrano::Configuration.instance(:must_exist).load do
       dump
       transfer
     end
-    
-    task :transfer, tasks_matching_for_db_dump do
-      cmd = "scp #{ssh_server}:#{dump_path}.gz ."
 
+    task :transfer, tasks_matching_for_db_dump do
       give_description "Grabbing the dump"
-      give_description "executing locally: #{cmd}"
-      
-      `#{cmd}`
+      download("#{dump_path}.gz", ".", :via => :scp)
     end
   end
 end
