@@ -59,8 +59,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
     
-    task :read_db_yml do
-      run("cat #{shared_path}/config/database.yml", tasks_matching_for_db_dump) do |_, _, data|
+    task :read_db_yml, tasks_matching_for_db_dump do
+      run("cat #{shared_path}/config/database.yml") do |_, _, data|
         @database_yml = data
       end
     end
@@ -95,7 +95,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
-    task :create_dump, :roles => :app, :except => { :no_release => true } do
+    task :create_dump, tasks_matching_for_db_dump do
       ignore_sessions = sessions_table ? "--ignore-table=#{database_name}.sessions" : ""
       
       command = <<-HERE
@@ -129,7 +129,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       run cmd
     end
     
-    task :before_dump do
+    task :before_dump, tasks_matching_for_db_dump do
       give_description "Removing old production dump from today"
       run "rm -rf #{dump_path}.gz"
     end
