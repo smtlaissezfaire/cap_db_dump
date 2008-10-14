@@ -16,16 +16,57 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :formatted_time, now.strftime("%Y-%m-%d")
     set :keep_dumps, 3
     
-    def dump_path
-      "#{dump_root_path}/#{database_name}_dump_#{formatted_time}.sql"
-    end
+    class << self
+      def dump_path
+        "#{dump_root_path}/#{database_name}_dump_#{formatted_time}.sql"
+      end
 
-    def give_description(desc_string)
-      puts "  ** #{desc_string}"
+      def give_description(desc_string)
+        puts "  ** #{desc_string}"
+      end
+      
+      def database_name
+        database_yml_in_env["database"]
+      end
+      
+      def database_username
+        database_yml_in_env["username"]
+      end
+      
+      def database_host
+        database_yml_in_env["host"]
+      end
+      
+      def database_password
+        database_yml_in_env["password"]
+      end
+      
+      def database_yml_in_env
+        database_yml[rails_env]
+      end
+      
+      def database_yml
+        if @database_yml
+          @database_yml
+        else
+          read_db_yml
+          @database_yml = YAML.load(@database_yml)
+        end
+      end
+      
+      def tasks_matching_for_db_dump
+        { :only => { :db_dump => true } }
+      end
+    end
+    
+    task :read_db_yml do
+      run("cat #{shared_path}/config/database.yml", tasks_matching_for_db_dump) do |_, _, data|
+        @database_yml = data
+      end
     end
 
     desc "Remove all but the last 3 production dumps"
-    task :cleanup, :roles => :app, :except => { :no_release => true } do
+    task :cleanup, tasks_matching_for_db_dump do
       cmd = "ls #{dump_root_path}/*"
 
       give_description "Cleaning up files"
@@ -67,7 +108,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       session_schema_dump if sessions_table
     end
     
-    task :session_schema_dump, :roles => :app, :except => { :no_release => true } do
+    task :session_schema_dump, tasks_matching_for_db_dump do
       command = <<-HERE
         mysqldump -u #{database_username} -h #{database_host} -p#{database_password} -Q --add-drop-table --single-transaction --no-data #{database_name} sessions >> #{dump_path}
       HERE
@@ -78,7 +119,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc "Create a dump of the production database"
-    task :dump, :roles => :app, :except => { :no_release => true } do
+    task :dump, tasks_matching_for_db_dump do
       cleanup
       create_dump
 
@@ -94,12 +135,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc "Make a production dump, transfer it to this machine"
-    task :dump_and_transfer, :roles => :app, :except => { :no_release => true } do
+    task :dump_and_transfer, tasks_matching_for_db_dump do
       dump
       transfer
     end
     
-    task :transfer, :roles => :app, :except => { :no_release => true } do
+    task :transfer, tasks_matching_for_db_dump do
       cmd = "scp #{ssh_server}:#{dump_path}.gz ."
 
       give_description "Grabbing the dump"
