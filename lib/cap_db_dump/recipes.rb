@@ -71,7 +71,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Remove all but the last 3 production dumps"
     task :cleanup, tasks_matching_for_db_dump do
-      cmd = "ls #{dump_root_path}/*"
+      cmd = "ls #{dump_root_path}/"
 
       give_description "Cleaning up files"
       
