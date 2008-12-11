@@ -28,6 +28,14 @@ Add these line to your config/deploy.rb file:
 $LOAD_PATH.unshift File.dirname(__FILE__) + "/../vendor/plugins"
 require "cap_db_dump/lib/cap_db_dump/recipes"
 
+Finally, add the :db_dump => true flag on the server where you'd like the mysqldump to run:
+
+  task :staging do
+    role :web,                  'example.com'
+    role :app,                  'example.com'
+    role :db,                   'example.com', :primary => true, :db_dump => true
+  end
+
 COPYRIGHT
 =========
 
