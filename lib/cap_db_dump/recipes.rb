@@ -6,7 +6,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     set :dump_root_path, "/tmp"
     set :now, Time.now
-    set :formatted_time, now.strftime("%Y-%m-%d")
+    set :formatted_time, now.strftime("%Y-%m-%d-%H:%M:%S")
     set :keep_dumps, 3
     
     class << self
