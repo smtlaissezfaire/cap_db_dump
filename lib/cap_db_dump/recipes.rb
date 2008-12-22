@@ -146,11 +146,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       run cmd
     end
     
-    task :before_dump, tasks_matching_for_db_dump do
-      give_description "Removing old production dump from today"
-      run "rm -rf #{dump_path}.gz"
-    end
-
     desc "Make a production dump, transfer it to this machine"
     task :dump_and_transfer, tasks_matching_for_db_dump do
       dump
