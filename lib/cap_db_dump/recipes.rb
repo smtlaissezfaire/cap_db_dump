@@ -27,7 +27,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       
       def database_host
-        database_yml_in_env["host"]
+        database_yml_in_env["host"] || "localhost"
       end
       
       def database_password
