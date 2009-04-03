@@ -8,8 +8,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :now, Time.now
     set :formatted_time, now.strftime("%Y-%m-%d-%H:%M:%S")
     set :keep_dumps, 3
-    
-    class << self
+
+    module CapDbDumpHelpers
       def dump_path
         "#{dump_root_path}/#{database_name}_dump_#{formatted_time}.sql"
       end
@@ -55,6 +55,8 @@ Capistrano::Configuration.instance(:must_exist).load do
         { :db_dump => true }
       end
     end
+
+    extend CapDbDumpHelpers
     
     task :read_db_yml, tasks_matching_for_db_dump do
       run("cat #{shared_path}/config/database.yml") do |_, _, data|
