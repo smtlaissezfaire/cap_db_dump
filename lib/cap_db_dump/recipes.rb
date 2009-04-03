@@ -102,7 +102,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       if all_files
         if database_files = all_files.select { |f| f =~ /#{database_name}/ }
           database_files.sort.reverse.each_with_index do |file, index|
-            yield file, index
+            yield "#{dump_root_path}/#{file}", index
           end
         end
       end
