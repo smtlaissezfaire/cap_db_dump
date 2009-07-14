@@ -41,7 +41,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       def database_yml
         @database_yml ||= begin
           read_db_yml
-          YAML.load(@database_yml)
+          YAML.load(@database_yml_text)
         end
       end
       
@@ -58,7 +58,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     
     task :read_db_yml, tasks_matching_for_db_dump do
       run("cat #{shared_path}/config/database.yml") do |_, _, data|
-        @database_yml = data
+        @database_yml_text = data
       end
     end
 
