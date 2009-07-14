@@ -85,14 +85,16 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
     
     def find_server_matching_options
-      role_names = roles.map {  |role| role[0] } # an array of role symbol names, like [:app, :db]
-      role_names.each { |role_name|
-        roles[role_name].servers.each { |server|
+      role_names = roles.map { |role| role[0] } # an array of role symbol names, like [:app, :db]
+      
+      role_names.each do |role_name|
+        roles[role_name].servers.each do |server|
           if server.options[:db_dump] == true
             return server
           end
-        }
-      }
+        end
+      end
+      
       nil
     end
     
