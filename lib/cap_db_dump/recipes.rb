@@ -57,8 +57,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     extend CapDbDumpHelpers
     
     task :read_db_yml, tasks_matching_for_db_dump do
-      run("cat #{shared_path}/config/database.yml") do |_, _, data|
-        @database_yml_text = data
+      run("cat #{shared_path}/config/database.yml") do |_, stream, data|
+        if stream == :err
+          raise "Could not open database.yml"
+        else
+          @database_yml_text = data
+        end
       end
     end
 
