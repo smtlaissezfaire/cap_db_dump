@@ -39,11 +39,9 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       
       def database_yml
-        if @database_yml
-          @database_yml
-        else
+        @database_yml ||= begin
           read_db_yml
-          @database_yml = YAML.load(@database_yml)
+          YAML.load(@database_yml)
         end
       end
       
