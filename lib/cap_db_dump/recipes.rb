@@ -39,26 +39,24 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       
       def database_yml
-        @database_yml ||= YAML.load(read_db_yml)
+        @database_yml ||= read_db_yml
       end
       
       def tasks_matching_for_db_dump
-        { :only => option_for_db_dump }
-      end
-      
-      def option_for_db_dump
-        { :db_dump => true }
+        { :only => { :db_dump => true } }
       end
     end
 
     extend CapDbDumpHelpers
     
     task :read_db_yml, tasks_matching_for_db_dump do
+      yaml = nil
+
       run("cat #{shared_path}/config/database.yml") do |_, stream, data|
-        raise "Could not open database.yml" if stream == :err
-        
-        data
+        yaml = YAML.load(data)
       end
+
+      yaml
     end
 
     desc "Remove all but the last 3 production dumps"
