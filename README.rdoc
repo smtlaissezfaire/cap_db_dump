@@ -1,12 +1,10 @@
-CAP DB DUMP
-=========
+= CAP DB DUMP
 
 Capistrano recipes for backing your production database and transferring it to
 your local machine.
 
 
-INSTALLATION
-============
+== INSTALLATION
 
 Install the plugin in vendor/plugins:
 
@@ -37,8 +35,7 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
   end
 
 
-USAGE
-=====
+== USAGE
 
   Create a dump:
 
@@ -53,8 +50,7 @@ USAGE
     cap database:cleanup
 
 
-COPYRIGHT
-=========
+== COPYRIGHT
 
 Copyright (c) 2008 Scott Taylor / Eastmedia <scott@eastmedia.com>
-Released under the MIT license
+Released under the MIT + GPL licenses
