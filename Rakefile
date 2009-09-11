@@ -4,7 +4,7 @@ require 'rake/rdoctask'
 
 desc 'Generate documentation for the cap_db_dump plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
+  rdoc.rdoc_dir = 'doc'
   rdoc.title    = 'CapDbDump'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README.rdoc')
