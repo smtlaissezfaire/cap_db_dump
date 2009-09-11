@@ -1,12 +1,6 @@
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
 
-desc 'Generate documentation for the cap_db_dump plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'doc'
-  rdoc.title    = 'CapDbDump'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README.rdoc')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+Dir.glob(File.dirname(__FILE__) + "/rake_tasks/**/**").each do |file|
+  load file
 end
+
+task :default => :spec
