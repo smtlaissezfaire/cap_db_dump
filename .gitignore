@@ -1,0 +1,6 @@
+*.bundle
+*.o
+tmp/
+TAGS
+doc
+pkg
