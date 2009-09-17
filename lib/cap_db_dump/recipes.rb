@@ -50,13 +50,15 @@ Capistrano::Configuration.instance(:must_exist).load do
     extend CapDbDumpHelpers
     
     task :read_db_yml, tasks_matching_for_db_dump do
-      yaml = nil
+      @database_yml ||= begin
+        yaml = nil
 
-      run("cat #{shared_path}/config/database.yml") do |_, stream, data|
-        yaml = YAML.load(data)
+        run("cat #{shared_path}/config/database.yml") do |_, stream, data|
+          yaml = YAML.load(data)
+        end
+
+        yaml
       end
-
-      yaml
     end
 
     desc "Remove all but the last 3 production dumps"
