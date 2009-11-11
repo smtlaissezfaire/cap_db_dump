@@ -61,24 +61,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
-    desc "Remove all but the last 3 production dumps"
-    task :cleanup, tasks_matching_for_db_dump do
-      cmd = "ls #{dump_root_path}/"
-
-      give_description "Cleaning up files"
-      
-      run cmd do |channel, stream, data|
-        unless stream == :err
-          each_database_file_with_index(data) do |file_name, index|
-            if index >= keep_dumps
-              give_description "Removing old dump #{file_name}"
-              run "rm -rf #{file_name}"
-            end
-          end
-        end
-      end
-    end
-    
     def find_server_matching_options
       role_names = roles.map { |role| role[0] } # an array of role symbol names, like [:app, :db]
       
@@ -97,18 +79,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       @server_matching_options ||= find_server_matching_options
     end
     
-    def each_database_file_with_index(data)
-      all_files = data.split(" ")
-      
-      if all_files
-        if database_files = all_files.select { |f| f =~ /#{database_name}/ }
-          database_files.sort.reverse.each_with_index do |file, index|
-            yield "#{dump_root_path}/#{file}", index
-          end
-        end
-      end
-    end
-
     def password_field
       database_password && database_password.any? ? "-p#{database_password}" : ""
     end
@@ -137,7 +107,6 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Create a dump of the production database"
     task :dump, tasks_matching_for_db_dump do
-      cleanup
       create_dump
 
       cmd = "gzip -9 #{dump_path}"

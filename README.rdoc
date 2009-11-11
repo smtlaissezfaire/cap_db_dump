@@ -45,10 +45,6 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
 
     cap database:dump_and_transfer
 
-  Cleanup old dumps (only the last 3 are preserved):
-
-    cap database:cleanup
-
 
 == COPYRIGHT
 
