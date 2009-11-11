@@ -56,24 +56,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
-    def find_server_matching_options
-      role_names = roles.map { |role| role[0] } # an array of role symbol names, like [:app, :db]
-      
-      role_names.each do |role_name|
-        roles[role_name].servers.each do |server|
-          if server.options[:db_dump] == true
-            return server
-          end
-        end
-      end
-      
-      nil
-    end
-    
-    def server_matching_options
-      @server_matching_options ||= find_server_matching_options
-    end
-    
     def password_field
       database_password && database_password.any? ? "-p#{database_password}" : ""
     end
