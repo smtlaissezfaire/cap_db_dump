@@ -14,17 +14,7 @@ Install the plugin in vendor/plugins:
 Or without submodules:
 
   # FROM RAILS_ROOT
-  cd vendor/plugins
-  git clone git://github.com/smtlaissezfaire/cap_db_dump.git
-  cd cap_db_dump
-  rm -rf .git
-  cd ../../.. # to RAILS_ROOT
-  
-
-Add these line to your config/deploy.rb file:
-
-$LOAD_PATH.unshift File.dirname(__FILE__) + "/../vendor/plugins"
-require "cap_db_dump/lib/cap_db_dump/recipes"
+  ruby script/plugin install git://github.com/smtlaissezfaire/cap_db_dump.git
 
 Finally, add the :db_dump => true flag on the server where you'd like the mysqldump to run:
 
