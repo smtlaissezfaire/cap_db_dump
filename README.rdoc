@@ -35,6 +35,9 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
 
     cap database:dump_and_transfer
 
+== Contributors:
+
+  Conor Hunt (conorh)
 
 == COPYRIGHT
 
