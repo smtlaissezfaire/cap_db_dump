@@ -26,17 +26,17 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
 
 == USAGE
 
-  Create a dump:
+Create a dump:
 
-    cap database:dump
+  cap database:dump
 
-  Create a dump, and transfer it with scp:
+Create a dump, and transfer it with scp:
 
-    cap database:dump_and_transfer
+  cap database:dump_and_transfer
 
-  Only dump the schema for a given set of tables (don't dump the data):
+Only dump the schema for a given set of tables (don't dump the data):
 
-    set :schema_only_tables, [:sessions, :my_large_table]
+  set :schema_only_tables, [:sessions, :my_large_table]
 
 == Contributors:
 
