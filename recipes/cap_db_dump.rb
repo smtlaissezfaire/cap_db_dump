@@ -1,12 +1,10 @@
 namespace :database do
-  # If you give a name for the session table, only the schema for that table will
-  # be backed up. If the value is nil, disregard this option
-  set :sessions_table,     nil
-
-  set :dump_root_path, "/tmp"
-  set :now, Time.now
-  set :formatted_time, now.strftime("%Y-%m-%d-%H:%M:%S")
-  set :keep_dumps, 3
+  # a list of tables for which only the schema, but no data should be dumped.
+  set :schema_only_tables, []
+  set :dump_root_path,     "/tmp"
+  set :now,                Time.now
+  set :formatted_time,     now.strftime("%Y-%m-%d-%H:%M:%S")
+  set :keep_dumps,         3
 
   module CapDbDumpHelpers
     def dump_path
@@ -60,25 +58,32 @@ namespace :database do
   end
 
   task :create_dump, tasks_matching_for_db_dump do
-    ignore_sessions = sessions_table ? "--ignore-table=#{database_name}.sessions" : ""
+    ignored_tables = schema_only_tables.map { |table_name|
+      "--ignore-table=#{database_name}.#{table_name}"
+    }
+
+    ignored_tables = ignored_tables.join(" ")
 
     command = "mysqldump -u #{database_username} -h #{database_host} #{password_field} -Q "
     command << "--add-drop-table -O add-locks=FALSE --lock-tables=FALSE --single-transaction "
-    command << "#{ignore_sessions} #{database_name} > #{dump_path}"
+    command << "#{ignored_tables} #{database_name} > #{dump_path}"
 
     give_description "About to dump production DB"
 
     run command
-    session_schema_dump if sessions_table
+    dump_schema_tables if schema_only_tables.any?
   end
 
-  task :session_schema_dump, tasks_matching_for_db_dump do
-    command = "mysqldump -u #{database_username} -h #{database_host} #{password_field} "
-    command << "-Q --add-drop-table --single-transaction --no-data #{database_name} sessions >> #{dump_path}"
+  task :dump_schema_tables, tasks_matching_for_db_dump do
+    if schema_only_tables.any?
+      table_names = schema_only_tables.join(" ")
 
-    give_description "Dumping sessions table from db"
+      command = "mysqldump -u #{database_username} -h #{database_host} #{password_field} "
+      command << "-Q --add-drop-table --single-transaction --no-data #{database_name} #{table_names} >> #{dump_path}"
 
-    run command
+      give_description "Dumping schema for tables: #{schema_only_tables.join(", ")}"
+      run command
+    end
   end
 
   desc "Create a dump of the production database"
