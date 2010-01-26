@@ -34,9 +34,9 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
 
     cap database:dump_and_transfer
 
-	Only dump the schema for a given set of tables (don't dump the data):
+  Only dump the schema for a given set of tables (don't dump the data):
 
-		set :schema_only_tables, [:sessions, :my_large_table]
+    set :schema_only_tables, [:sessions, :my_large_table]
 
 == Contributors:
 
