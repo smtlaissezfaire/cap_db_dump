@@ -2,8 +2,7 @@ namespace :database do
   # a list of tables for which only the schema, but no data should be dumped.
   set :schema_only_tables, []
   set :dump_root_path,     "/tmp"
-  set :now,                Time.now
-  set :formatted_time,     now.strftime("%Y-%m-%d-%H:%M:%S")
+  set :formatted_time,     Time.now.strftime("%Y-%m-%d-%H:%M:%S")
 
   module CapDbDumpHelpers
     def dump_path
