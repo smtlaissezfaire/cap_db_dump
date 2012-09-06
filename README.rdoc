@@ -6,15 +6,15 @@ your local machine.
 
 == INSTALLATION
 
-Install the plugin in vendor/plugins:
+1. Install the gem in bundler's Gemfile:
 
-  # FROM RAILS_ROOT
-  git submodule add git://github.com/smtlaissezfaire/cap_db_dump.git vendor/plugins/cap_db_dump
+  gem 'cap_db_dump'
 
-Or without submodules:
+  $ bundle install
 
-  # FROM RAILS_ROOT
-  ruby script/plugin install git://github.com/smtlaissezfaire/cap_db_dump.git
+2. Require the gem in the cap file:
+
+  require 'cap_db_dump'
 
 Finally, add the :db_dump => true flag on the server where you'd like the mysqldump to run:
 
