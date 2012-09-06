@@ -14,7 +14,7 @@ your local machine.
 
 2. Require the gem in the cap file:
 
-  require 'cap_db_dump'
+  require 'cap_db_dump/recipes'
 
 Finally, add the :db_dump => true flag on the server where you'd like the mysqldump to run:
 
