@@ -47,8 +47,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     task :read_db_yml, tasks_matching_for_db_dump do
       @database_yml ||= begin
-        yaml = capture("cat #{shared_path}/config/database.yml")
-        YAML.load(yaml)
+        if dry_run
+          raise "Cannot be run in dry_run mode!"
+        end
+
+        yaml = capture("cat #{current_path}/config/database.yml")
+        YAML.safe_load(yaml, aliases: true)
       end
     end
 
