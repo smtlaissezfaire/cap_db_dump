@@ -51,4 +51,5 @@ Only dump the schema for a given set of tables (don't dump the data):
 == COPYRIGHT
 
 Copyright (c) 2008-2022 Scott Taylor / Eastmedia <scott@eastmedia.com>
+
 Released under the MIT + GPL licenses
