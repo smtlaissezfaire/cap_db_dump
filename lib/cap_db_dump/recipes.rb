@@ -107,7 +107,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     task :transfer, tasks_matching_for_db_dump do
       give_description "Grabbing the dump"
-      download("#{dump_path}.gz", ".", :via => :scp)
+      gzip_file = "#{dump_path}.gz"
+      download(gzip_file, ".", :via => :scp)
+
+      give_description "Symlinking locally"
+      base_name = File.basename(gzip_file)
+      `ln -sf #{base_name} current.sql.gz`
     end
   end
 end
