@@ -24,6 +24,11 @@ Finally, add the :db_dump => true flag on the server where you'd like the mysqld
     role :db,                   'example.com', :primary => true, :db_dump => true
   end
 
+Make sure `rails_env` and `database_engine` variables are set
+
+  set :rails_env, "production"
+  set :database_engine, :mysql # specify :mysql | :psql
+
 == USAGE
 
 Create a dump:
