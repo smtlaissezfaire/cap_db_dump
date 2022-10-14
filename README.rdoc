@@ -62,7 +62,7 @@ Restore script is not included, but you may want to do something like this (post
 
     set -e
 
-    gunzip -c current.sql.gz -k | pg_restore --create --verbose --clean --no-acl --no-owner -h localhost -d my_app_development
+    gunzip -c current.sql.gz -k | pg_restore --verbose --clean --no-acl --no-owner -h localhost -d my_app_development
 
 
 == Contributors:
