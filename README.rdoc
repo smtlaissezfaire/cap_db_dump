@@ -50,6 +50,21 @@ Only dump the schema for a given set of tables (don't dump the data):
 
   set :schema_only_tables, [:sessions, :my_large_table]
 
+== Restore script
+
+Restore script is not included, but you may want to do something like this (postgres example):
+
+    #!/usr/bin/env bash
+
+    set -x
+
+    createdb my_app_development
+
+    set -e
+
+    gunzip -c current.sql.gz -k | pg_restore --create --verbose --clean --no-acl --no-owner -h localhost -d my_app_development
+
+
 == Contributors:
 
   Conor Hunt (conorh)
