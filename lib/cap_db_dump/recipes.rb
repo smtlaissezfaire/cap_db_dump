@@ -149,6 +149,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     task :transfer, tasks_matching_for_db_dump do
+      # TODO: should look in /tmp for latest file
       give_description "Grabbing the dump"
       gzip_file = "#{dump_path}.gz"
       download(gzip_file, ".", :via => :scp)
