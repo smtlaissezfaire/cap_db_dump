@@ -33,7 +33,7 @@ You also might want to add these to your .gitignore:
 
 ```
 current.sql.gz
-*dump_2022-10-14-18:10:39.sql.gz
+*dump_*.sql.gz
 ```
 
 == USAGE
