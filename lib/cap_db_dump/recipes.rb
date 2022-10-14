@@ -10,6 +10,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :dump_root_path,     "/tmp"
     set :formatted_time,     Time.now.utc.strftime("%Y-%m-%d-%H:%M:%S")
     set :database_engine, :mysql # specify :mysql | :psql
+    # https://www.postgresql.org/docs/12/app-pgdump.html
+    set :pg_dump_format, :c # specify c: 'compressed' (aka -Fc), :d 'directory', or set to nil for plain text
 
     module CapDbDumpHelpers
       def dump_path
@@ -102,7 +104,10 @@ Capistrano::Configuration.instance(:must_exist).load do
 
         ignored_tables = ignored_tables.join(" ")
 
-        command = "#{pg_password} pg_dump -U #{database_username} -h #{database_host} #{postgres_port}"
+        command = "#{pg_password} pg_dump -U #{database_username} -h #{database_host} #{postgres_port} "
+        if pg_dump_format
+          command << "-F#{pg_dump_format} "
+        end
         command << "#{ignored_tables} #{database_name} > #{dump_path}"
       else
         raise "Unknown database engine. use one of: #{DATABASE_ENGINES.inspect}"
