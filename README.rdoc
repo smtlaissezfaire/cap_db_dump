@@ -29,6 +29,13 @@ Make sure `rails_env` and `database_engine` variables are set
   set :rails_env, "production"
   set :database_engine, :mysql # specify :mysql | :psql
 
+You also might want to add these to your .gitignore:
+
+```
+current.sql.gz
+*dump_2022-10-14-18:10:39.sql.gz
+```
+
 == USAGE
 
 Create a dump:
