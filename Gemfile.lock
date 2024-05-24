@@ -1,0 +1,31 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    capistrano (2.15.11)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    highline (3.0.1)
+    net-scp (4.0.0)
+      net-ssh (>= 2.6.5, < 8.0.0)
+    net-sftp (4.0.0)
+      net-ssh (>= 5.0.0, < 8.0.0)
+    net-ssh (7.2.3)
+    net-ssh-gateway (2.0.0)
+      net-ssh (>= 4.0.0)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  capistrano (~> 2.15.10)
+  net-ssh (~> 7.2.3)
+
+RUBY VERSION
+   ruby 3.3.1p55
+
+BUNDLED WITH
+   2.5.9
