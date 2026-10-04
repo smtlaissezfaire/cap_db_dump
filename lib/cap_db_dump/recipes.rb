@@ -68,8 +68,18 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
+    def database_password?
+      database_password && !database_password.to_s.empty?
+    end
+
+    # --defaults-extra-file must be the first option given to mysqldump
     def mysql_password_field
-      database_password && database_password.length > 0 ? "-p#{database_password}" : ""
+      database_password? ? "--defaults-extra-file=/dev/stdin" : ""
+    end
+
+    def mysql_password_stdin
+      escaped_password = database_password.to_s.gsub("\\") { "\\\\" }
+      "[client]\npassword=\"#{escaped_password}\"\n"
     end
 
     def postgres_port
@@ -77,9 +87,20 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     def pg_password
-      database_password && !database_password.empty? ?
-        "PGPASSWORD=#{database_password}" :
-        ""
+      database_password? ? "IFS= read -r PGPASSWORD && export PGPASSWORD &&" : ""
+    end
+
+    def pg_password_stdin
+      "#{database_password}\n"
+    end
+
+    # A pty would echo the password on stdin back into the (logged) output.
+    def run_with_password(command, stdin_data)
+      if database_password?
+        run command, :data => stdin_data, :eof => true, :pty => false
+      else
+        run command
+      end
     end
 
     def pg_port
@@ -94,9 +115,10 @@ Capistrano::Configuration.instance(:must_exist).load do
 
         ignored_tables = ignored_tables.join(" ")
 
-        command = "mysqldump -u #{database_username} -h #{database_host} #{mysql_password_field} -Q "
+        command = "mysqldump #{mysql_password_field} -u #{database_username} -h #{database_host} -Q "
         command << "--add-drop-table -O add-locks=FALSE --lock-tables=FALSE --single-transaction "
         command << "#{ignored_tables} #{database_name} > #{dump_path}"
+        password_stdin = mysql_password_stdin
       elsif database_engine == POSTGRES
         ignored_tables = schema_only_tables.map { |table_name|
           "--exclude-table=#{database_name}.#{table_name}"
@@ -109,13 +131,14 @@ Capistrano::Configuration.instance(:must_exist).load do
           command << "-F#{pg_dump_format} "
         end
         command << "#{ignored_tables} #{database_name} > #{dump_path}"
+        password_stdin = pg_password_stdin
       else
         raise "Unknown database engine. use one of: #{DATABASE_ENGINES.inspect}"
       end
 
       give_description "About to dump production DB"
 
-      run command
+      run_with_password command, password_stdin
       dump_schema_tables if schema_only_tables.any?
     end
 
@@ -124,7 +147,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         table_names = schema_only_tables.join(" ")
 
         if database_engine == MYSQL
-          command = "mysqldump -u #{database_username} -h #{database_host} #{mysql_password_field} "
+          command = "mysqldump #{mysql_password_field} -u #{database_username} -h #{database_host} "
           command << "-Q --add-drop-table --single-transaction --no-data #{database_name} #{table_names} >> #{dump_path}"
         elsif database_engine == POSTGRES
           raise "not yet supported. PR's welcome! (https://github.com/smtlaissezfaire/cap_db_dump)"
@@ -133,7 +156,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         end
 
         give_description "Dumping schema for tables: #{schema_only_tables.join(", ")}"
-        run command
+        run_with_password command, mysql_password_stdin
       end
     end
 
