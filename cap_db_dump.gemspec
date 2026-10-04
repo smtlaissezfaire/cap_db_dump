@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'cap_db_dump'
-  s.version = '1.3.0'
-  s.date = '2024-05-24'
+  s.version = '1.3.1'
+  s.date = '2026-10-03'
   s.summary = "cap_db_dump"
   s.description = "Capistrano tasks for dumping your mysql database + transfering to your local machine"
   s.authors = ["Scott Taylor"]
