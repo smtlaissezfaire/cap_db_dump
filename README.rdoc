@@ -50,6 +50,9 @@ Only dump the schema for a given set of tables (don't dump the data):
 
   set :schema_only_tables, [:sessions, :my_large_table]
 
+With postgres this uses pg_dump --exclude-table-data, so the tables are still
+created on restore, just empty.
+
 == DATABASE CONFIG WITH ERB
 
 The database settings are read from config/database.yml in the current release.

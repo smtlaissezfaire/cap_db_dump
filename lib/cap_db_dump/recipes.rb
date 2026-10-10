@@ -166,7 +166,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         password_stdin = mysql_password_stdin
       elsif database_engine == POSTGRES
         ignored_tables = schema_only_tables.map { |table_name|
-          "--exclude-table=#{database_name}.#{table_name}"
+          "--exclude-table-data=#{table_name}"
         }
 
         ignored_tables = ignored_tables.join(" ")
@@ -194,14 +194,14 @@ Capistrano::Configuration.instance(:must_exist).load do
         if database_engine == MYSQL
           command = "mysqldump #{mysql_password_field} -u #{database_username} -h #{database_host} "
           command << "-Q --add-drop-table --single-transaction --no-data #{database_name} #{table_names} >> #{dump_path}"
+
+          give_description "Dumping schema for tables: #{schema_only_tables.join(", ")}"
+          run_with_password command, mysql_password_stdin
         elsif database_engine == POSTGRES
-          raise "not yet supported. PR's welcome! (https://github.com/smtlaissezfaire/cap_db_dump)"
+          # pg_dump --exclude-table-data in create_dump already keeps the schema for these tables
         else
           raise "Unknown database engine. use one of: #{DATABASE_ENGINES.inspect}"
         end
-
-        give_description "Dumping schema for tables: #{schema_only_tables.join(", ")}"
-        run_with_password command, mysql_password_stdin
       end
     end
 

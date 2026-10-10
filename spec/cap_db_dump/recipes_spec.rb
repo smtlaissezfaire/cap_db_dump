@@ -404,11 +404,22 @@ describe "database recipes" do
       @database.create_dump
     end
 
-    it "should not support schema_only_tables yet" do
-      @configuration.set :schema_only_tables, [:sessions]
-      @database.stub(:run)
+    it "should dump only the schema of schema_only_tables" do
+      @configuration.set :schema_only_tables, [:sessions, :versions]
 
-      lambda { @database.create_dump }.should raise_error(/not yet supported/)
+      @database.should_receive(:run).once.with(
+        command_line(
+          "IFS= read -r PGPASSWORD && export PGPASSWORD && " \
+          "pg_dump -U deploy -h db.example.com -Fc " \
+          "--exclude-table-data=sessions --exclude-table-data=versions " \
+          "my_app_production > #{@dump_path}"
+        ),
+        :data => "s3cret\n",
+        :eof => true,
+        :pty => false
+      )
+
+      @database.create_dump
     end
   end
 
