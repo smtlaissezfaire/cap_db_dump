@@ -1,3 +1,6 @@
+require "json"
+require "yaml"
+
 Capistrano::Configuration.instance(:must_exist).load do
   namespace :database do
     DATABASE_ENGINES = [
@@ -12,6 +15,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :database_engine, :mysql # specify :mysql | :psql
     # https://www.postgresql.org/docs/12/app-pgdump.html
     set :pg_dump_format, :c # specify c: 'compressed' (aka -Fc), :d 'directory', or set to nil for plain text
+    # :yaml reads config/database.yml as plain YAML, :rails asks `rails runner` on the server for the
+    # resolved config, and :auto uses :yaml unless database.yml contains ERB.
+    set :database_config_source, :auto
 
     module CapDbDumpHelpers
       def dump_path
@@ -50,6 +56,32 @@ Capistrano::Configuration.instance(:must_exist).load do
         @database_yml ||= read_db_yml
       end
 
+      def database_yml_path
+        "#{current_path}/config/database.yml"
+      end
+
+      def database_config_from_yaml(yaml)
+        YAML.safe_load(yaml, aliases: true)
+      end
+
+      # rvm-capistrano wraps commands in `rvm-shell '...' -c '...'`, so this must not contain single quotes.
+      def rails_runner_database_config_command
+        ruby = "puts :CAP_DB_DUMP_CONFIG_BEGIN, ActiveRecord::Base.connection_db_config.configuration_hash.to_json, :CAP_DB_DUMP_CONFIG_END"
+        "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rails runner \"#{ruby}\""
+      end
+
+      # No pty, so stderr stays out of the captured output and the output (which has the password) isn't echoed.
+      def database_config_from_rails
+        output = capture(rails_runner_database_config_command, :pty => false)
+        json = output[/CAP_DB_DUMP_CONFIG_BEGIN\s*(\{.*?\})\s*CAP_DB_DUMP_CONFIG_END/m, 1]
+
+        unless json
+          raise "Could not find the database config in the output of rails runner"
+        end
+
+        { rails_env.to_s => JSON.parse(json) }
+      end
+
       def tasks_matching_for_db_dump
         { :only => { :db_dump => true } }
       end
@@ -63,8 +95,17 @@ Capistrano::Configuration.instance(:must_exist).load do
           raise "Cannot be run in dry_run mode!"
         end
 
-        yaml = capture("cat #{current_path}/config/database.yml")
-        YAML.safe_load(yaml, aliases: true)
+        case database_config_source.to_sym
+        when :yaml
+          database_config_from_yaml(capture("cat #{database_yml_path}"))
+        when :rails
+          database_config_from_rails
+        when :auto
+          yaml = capture("cat #{database_yml_path}")
+          yaml.include?("<%") ? database_config_from_rails : database_config_from_yaml(yaml)
+        else
+          raise "Unknown database_config_source. use one of: [:yaml, :rails, :auto]"
+        end
       end
     end
 
@@ -82,8 +123,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       "[client]\npassword=\"#{escaped_password}\"\n"
     end
 
+    def database_port?
+      database_port && !database_port.to_s.strip.empty?
+    end
+
     def postgres_port
-      database_port ? "-p #{database_port}" : ""
+      database_port? ? "-p #{database_port}" : ""
     end
 
     def pg_password
@@ -104,7 +149,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     def pg_port
-      database_port && !database_port.empty? ? "-p #{database_port}" : ""
+      database_port? ? "-p #{database_port}" : ""
     end
 
     task :create_dump, tasks_matching_for_db_dump do

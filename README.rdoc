@@ -50,6 +50,24 @@ Only dump the schema for a given set of tables (don't dump the data):
 
   set :schema_only_tables, [:sessions, :my_large_table]
 
+== DATABASE CONFIG WITH ERB
+
+The database settings are read from config/database.yml in the current release.
+If that file uses ERB (for example, to pull credentials out of
+Rails.application.credentials), it can't be read as plain YAML. In that case
+the settings are fetched from Rails on the server instead, with:
+
+  cd <current_path> && RAILS_ENV=<rails_env> bundle exec rails runner "..."
+
+This boots your app on the db_dump server, so it needs Rails 6.1+ and the
+credentials key to be present there.
+
+Control this with :database_config_source:
+
+  set :database_config_source, :auto  # default. plain YAML, unless database.yml contains <%
+  set :database_config_source, :yaml  # always read database.yml as plain YAML (the old behavior)
+  set :database_config_source, :rails # always ask rails runner for the resolved config
+
 == Restore script
 
 Restore script is not included, but you may want to do something like this (postgres example):
